@@ -1,0 +1,1 @@
+export { LikesScreen } from './LikesScreen';
