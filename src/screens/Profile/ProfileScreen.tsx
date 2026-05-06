@@ -15,6 +15,7 @@ import {
   ProfileCompletionCard,
   ProfileStatsCard,
 } from '../../components/profile';
+import { SettingsScreen } from '../Settings';
 import { Colors } from '../../styles/colors';
 import { Spacing } from '../../styles/spacing';
 
@@ -44,9 +45,22 @@ const D = {
   verified: '#7B5CFA',
 } as const;
 
-export function ProfileScreen(): React.JSX.Element {
+interface ProfileScreenProps {
+  onSignOut?: () => void;
+}
+
+export function ProfileScreen({ onSignOut }: ProfileScreenProps): React.JSX.Element {
   const insets = useSafeAreaInsets();
-  const [_showSettings, setShowSettings] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  if (showSettings) {
+    return (
+      <SettingsScreen
+        onBack={() => setShowSettings(false)}
+        onSignOut={onSignOut}
+      />
+    );
+  }
 
   const topPad =
     Platform.OS === 'android'
@@ -106,10 +120,7 @@ export function ProfileScreen(): React.JSX.Element {
               { top: topPad + 12 },
               pressed && styles.pressed,
             ]}
-            onPress={() => {
-              setShowSettings(true);
-              console.log('Open Settings');
-            }}
+            onPress={() => setShowSettings(true)}
             accessibilityRole="button"
             accessibilityLabel="Settings"
           >

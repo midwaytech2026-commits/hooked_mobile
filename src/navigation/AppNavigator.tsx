@@ -76,6 +76,7 @@ export function AppNavigator(): React.JSX.Element {
     case 'login':
       return (
         <LoginScreen
+          onBack={() => setScreen('intro')}
           onLoginSuccess={() => setScreen('home')}
           onNavigateToRegister={() => setScreen('register')}
         />
@@ -123,7 +124,11 @@ export function AppNavigator(): React.JSX.Element {
 
     case 'home':
     default:
-      return <HomeScreen />;
+      return (
+        <HomeScreen
+          onSignOut={() => setScreen('intro')}
+        />
+      );
   }
 }
 

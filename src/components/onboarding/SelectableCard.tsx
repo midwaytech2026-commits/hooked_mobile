@@ -19,6 +19,7 @@ export function SelectableCard({
 }: SelectableCardProps): React.JSX.Element {
   return (
     <Pressable
+      android_ripple={{ color: 'transparent' }}
       style={({ pressed }) => [
         styles.card,
         selected && styles.cardSelected,

@@ -7,7 +7,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { Spacing } from '../../styles/spacing';
 
 interface SearchBarProps {
   value: string;
@@ -28,7 +27,7 @@ export function SearchBar({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="rgba(255,255,255,0.3)"
+        placeholderTextColor="rgba(255,255,255,0.28)"
         returnKeyType="search"
         autoCorrect={false}
         autoCapitalize="none"
@@ -36,6 +35,7 @@ export function SearchBar({
       />
       {Platform.OS === 'android' && value.length > 0 && (
         <Pressable
+          android_ripple={{ color: 'transparent' }}
           onPress={() => onChangeText('')}
           accessibilityRole="button"
           accessibilityLabel="Clear search"
@@ -52,15 +52,15 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1B1B27',
-    borderRadius: 14,
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Platform.OS === 'android' ? 10 : 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    height: 48,
     gap: 10,
   },
   icon: {
     fontSize: 20,
-    color: 'rgba(255,255,255,0.35)',
+    color: 'rgba(255,255,255,0.3)',
     includeFontPadding: false,
     lineHeight: 22,
   },
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.35)',
     includeFontPadding: false,
   },
 });

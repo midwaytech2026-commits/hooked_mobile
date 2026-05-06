@@ -25,6 +25,7 @@ import {
   View,
   type ViewStyle,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { InputField } from '../../components/forms/InputField';
 import { Colors } from '../../styles/colors';
@@ -284,52 +285,26 @@ export function RegisterScreen({
             { paddingBottom: Math.max(insets.bottom, Spacing.lg) },
           ]}
         >
-          {/*
-            ── LinearGradient upgrade ────────────────────────────────────────
-            After: npm install react-native-linear-gradient && cd ios && pod install
-
-            REMOVE the solid-color <Pressable> below and UNCOMMENT this block:
-
-            import LinearGradient from 'react-native-linear-gradient';
-
-            <LinearGradient
-              colors={agreedToTerms ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.continueBtn}
-            >
-              <Pressable
-                style={({ pressed }) => [
-                  styles.continueBtnInner,
-                  pressed && agreedToTerms && styles.pressed,
-                ]}
-                onPress={handleContinue}
-                disabled={!agreedToTerms}
-                accessibilityRole="button"
-                accessibilityLabel="Continue"
-                accessibilityState={{ disabled: !agreedToTerms }}
-              >
-                <Text style={styles.continueBtnText}>Continue</Text>
-              </Pressable>
-            </LinearGradient>
-            ─────────────────────────────────────────────────────────────── */}
-
-          {/* Solid-colour fallback (remove once LinearGradient is installed) */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.continueBtn,
-              styles.continueBtnInner,
-              !agreedToTerms && styles.continueBtnDisabled,
-              pressed && agreedToTerms && styles.pressed,
-            ]}
-            onPress={handleContinue}
-            disabled={!agreedToTerms}
-            accessibilityRole="button"
-            accessibilityLabel="Continue"
-            accessibilityState={{ disabled: !agreedToTerms }}
+          <LinearGradient
+            colors={agreedToTerms ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.continueBtn}
           >
-            <Text style={styles.continueBtnText}>Continue</Text>
-          </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.continueBtnInner,
+                pressed && agreedToTerms && styles.pressed,
+              ]}
+              onPress={handleContinue}
+              disabled={!agreedToTerms}
+              accessibilityRole="button"
+              accessibilityLabel="Continue"
+              accessibilityState={{ disabled: !agreedToTerms }}
+            >
+              <Text style={styles.continueBtnText}>Continue</Text>
+            </Pressable>
+          </LinearGradient>
 
           {/* Sign in link */}
           <Pressable
@@ -463,27 +438,19 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
 
-  // Shared outer shape (used by both solid Pressable and LinearGradient wrapper)
   continueBtn: {
     borderRadius: 100,
     overflow: 'hidden',
-    backgroundColor: D.btnOn,
     shadowColor: D.btnGlow,
     shadowOpacity: 0.6,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
   },
-  // Padding & alignment for button content
   continueBtnInner: {
     paddingVertical: Spacing.md + 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  continueBtnDisabled: {
-    backgroundColor: D.btnOff,
-    shadowOpacity: 0,
-    elevation: 0,
   },
   continueBtnText: {
     fontSize: 17,

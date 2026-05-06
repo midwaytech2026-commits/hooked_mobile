@@ -1,31 +1,74 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Colors } from '../../styles/colors';
+import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type TabName = 'discover' | 'likes' | 'spark' | 'chat' | 'profile';
 
-// Each tab can override the circle color shown when it is active.
-const TAB_ACTIVE_BG: Record<TabName, string> = {
-  discover: Colors.brand.purple,
-  likes:    Colors.brand.pink,
-  spark:    Colors.brand.pink,
-  chat:     Colors.brand.pink,
-  profile:  Colors.brand.purple,
-};
+const ACTIVE_GRADIENT: [string, string] = ['#FF4F8B', '#8B5CF6'];
+const C_INACTIVE = '#8A8A98';
+
+// ── Inline icon components ─────────────────────────────────────────────────────
+
+function DiscoverIcon({ color }: { color: string }) {
+  return (
+    <View style={ic.wrap}>
+      <View style={[ic.outerRing, { borderColor: color }]}>
+        <View style={[ic.innerDot, { backgroundColor: color }]} />
+      </View>
+    </View>
+  );
+}
+
+function HeartIcon({ color }: { color: string }) {
+  return (
+    <View style={ic.wrap}>
+      <Text style={[ic.symbol, { color }]}>♥</Text>
+    </View>
+  );
+}
+
+function SparkIcon({ color }: { color: string }) {
+  return (
+    <View style={ic.wrap}>
+      <Text style={[ic.symbol, { color }]}>✦</Text>
+    </View>
+  );
+}
+
+function ChatIcon({ color }: { color: string }) {
+  return (
+    <View style={ic.chatWrap}>
+      <View style={[ic.chatBody, { borderColor: color }]} />
+      <View style={[ic.chatTail, { borderTopColor: color }]} />
+    </View>
+  );
+}
+
+function ProfileIcon({ color }: { color: string }) {
+  return (
+    <View style={ic.wrap}>
+      <View style={[ic.profileHead, { backgroundColor: color }]} />
+      <View style={[ic.profileShoulder, { borderColor: color }]} />
+    </View>
+  );
+}
+
+// ── Tab config ─────────────────────────────────────────────────────────────────
 
 const TABS: Array<{
   id: TabName;
-  icon: string;
-  /** Icon to show when this tab is active (optional — falls back to icon). */
-  activeIcon?: string;
   label: string;
+  Icon: React.ComponentType<{ color: string }>;
 }> = [
-  { id: 'discover', icon: '◉',             label: 'Discover' },
-  { id: 'likes',    icon: '♡', activeIcon: '♥', label: 'Likes' },
-  { id: 'spark',    icon: '✦',             label: 'Spark' },
-  { id: 'chat',     icon: '◌',             label: 'Chat' },
-  { id: 'profile',  icon: '⊙',             label: 'Profile' },
+  { id: 'discover', label: 'Discover', Icon: DiscoverIcon },
+  { id: 'likes',    label: 'Likes',    Icon: HeartIcon },
+  { id: 'spark',    label: 'Spark',    Icon: SparkIcon },
+  { id: 'chat',     label: 'Chat',     Icon: ChatIcon },
+  { id: 'profile',  label: 'Profile',  Icon: ProfileIcon },
 ];
+
+// ── Component ──────────────────────────────────────────────────────────────────
 
 interface BottomTabBarProps {
   activeTab?: TabName;
@@ -36,44 +79,61 @@ export function BottomTabBar({
   activeTab = 'discover',
   onTabPress,
 }: BottomTabBarProps): React.JSX.Element {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
-      {TABS.map(tab => {
-        const isActive = tab.id === activeTab;
-        const displayIcon = isActive && tab.activeIcon ? tab.activeIcon : tab.icon;
-        return (
-          <Pressable
-            key={tab.id}
-            style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
-            onPress={() => onTabPress?.(tab.id)}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-            accessibilityLabel={tab.label}
-          >
-            <View
-              style={[
-                styles.iconWrap,
-                isActive && { backgroundColor: TAB_ACTIVE_BG[tab.id] },
-              ]}
+    <View style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      <View style={styles.container}>
+        {TABS.map(({ id, label, Icon }) => {
+          const isActive = id === activeTab;
+          return (
+            <Pressable
+              key={id}
+              android_ripple={{ color: 'transparent' }}
+              style={({ pressed }) => [styles.tab, pressed && styles.tabPressed]}
+              onPress={() => onTabPress?.(id)}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: isActive }}
+              accessibilityLabel={label}
             >
-              <Text style={[styles.icon, isActive && styles.iconActive]}>
-                {displayIcon}
-              </Text>
-            </View>
-          </Pressable>
-        );
-      })}
+              {isActive ? (
+                <LinearGradient
+                  colors={ACTIVE_GRADIENT}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.activeWrap}
+                >
+                  <Icon color="#FFFFFF" />
+                </LinearGradient>
+              ) : (
+                <View style={styles.inactiveWrap}>
+                  <Icon color={C_INACTIVE} />
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
 
+// ── Styles ─────────────────────────────────────────────────────────────────────
+
 const styles = StyleSheet.create({
+  wrapper: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+  },
   container: {
     flexDirection: 'row',
-    backgroundColor: '#111119',
-    borderTopWidth: 1,
-    borderTopColor: '#1E1E2E',
+    backgroundColor: 'rgba(10,10,16,0.92)',
+    borderRadius: 36,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
     paddingVertical: 10,
+    paddingHorizontal: 8,
+    justifyContent: 'space-between',
   },
   tab: {
     flex: 1,
@@ -81,21 +141,87 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabPressed: { opacity: 0.7 },
-
-  iconWrap: {
+  activeWrap: {
     width: 44,
     height: 44,
     borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  icon: {
-    fontSize: 22,
-    color: 'rgba(255,255,255,0.35)',
-    includeFontPadding: false,
+  inactiveWrap: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  iconActive: {
-    color: '#FFFFFF',
+});
+
+// Icon sub-styles
+const ic = StyleSheet.create({
+  wrap: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  symbol: {
+    fontSize: 19,
+    lineHeight: 22,
+    includeFontPadding: false,
+    textAlign: 'center',
+  },
+  // Discover: scope/target
+  outerRing: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  innerDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  // Chat bubble
+  chatWrap: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 2,
+  },
+  chatBody: {
+    width: 20,
+    height: 14,
+    borderRadius: 5,
+    borderWidth: 2,
+  },
+  chatTail: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 4,
+    borderRightWidth: 0,
+    borderTopWidth: 4,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    alignSelf: 'flex-start',
+    marginLeft: 5,
+  },
+  // Profile silhouette
+  profileHead: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginBottom: 3,
+  },
+  profileShoulder: {
+    width: 18,
+    height: 9,
+    borderTopLeftRadius: 9,
+    borderTopRightRadius: 9,
+    borderWidth: 2,
+    borderBottomWidth: 0,
   },
 });

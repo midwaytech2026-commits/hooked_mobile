@@ -1,8 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { OnlineIndicator } from '../matches/OnlineIndicator';
 import type { InboxConversation } from '../../screens/Inbox/mockConversations';
-import { Spacing } from '../../styles/spacing';
 
 const AVATAR_SIZE = 56;
 
@@ -21,78 +21,106 @@ export function ConversationRow({
 
   return (
     <Pressable
+      android_ripple={{ color: 'transparent' }}
       style={({ pressed }) => [
-        styles.row,
-        selected && styles.rowSelected,
-        pressed && !selected && styles.rowPressed,
+        styles.card,
+        selected && styles.cardSelected,
+        pressed && !selected && styles.cardPressed,
       ]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={`${conversation.name}: ${conversation.lastMessage}`}
       accessibilityState={{ selected }}
     >
-      {/* Avatar */}
+      {/* ── LEFT: Avatar ──────────────────────────────────────────────── */}
       <View style={styles.avatarWrap}>
         <View style={[styles.avatar, { backgroundColor: conversation.placeholderBg }]}>
-          <View style={[styles.avatarGlow, { backgroundColor: conversation.placeholderAccent }]} />
+          <View
+            style={[styles.avatarGlow, { backgroundColor: conversation.placeholderAccent }]}
+          />
           <View style={styles.avatarHead} />
           <View style={styles.avatarBody} />
         </View>
         {conversation.online && (
           <View style={styles.onlineDot}>
-            <OnlineIndicator size={14} borderColor={selected ? '#1C1C2A' : '#0D0D14'} />
+            <OnlineIndicator
+              size={13}
+              borderColor={selected ? '#161625' : '#0D0D14'}
+            />
           </View>
         )}
       </View>
 
-      {/* Text content */}
-      <View style={styles.content}>
-        <View style={styles.topRow}>
-          <Text
-            style={[styles.name, hasUnread && styles.nameUnread]}
-            numberOfLines={1}
-          >
-            {conversation.name}
-          </Text>
-          <Text style={[styles.time, hasUnread && styles.timeUnread]}>
-            {conversation.time}
-          </Text>
-        </View>
-        <View style={styles.bottomRow}>
-          <Text
-            style={[styles.message, hasUnread && styles.messageUnread]}
-            numberOfLines={1}
-          >
-            {conversation.lastMessage}
-          </Text>
-          {hasUnread && (
-            <View style={styles.badge}>
+      {/* ── CENTER: Name + preview ─────────────────────────────────────── */}
+      {/*
+       * flex: 1 lets this column fill available space but STOPS before
+       * pushing the right section off-screen, because the right section
+       * has no flex and therefore reserves its own intrinsic width first.
+       */}
+      <View style={styles.centerSection}>
+        <Text
+          style={[styles.name, hasUnread && styles.nameUnread]}
+          numberOfLines={1}
+        >
+          {conversation.name}
+        </Text>
+        <Text
+          style={[styles.preview, hasUnread && styles.previewUnread]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {conversation.lastMessage}
+        </Text>
+      </View>
+
+      {/* ── RIGHT: Time + unread badge ─────────────────────────────────── */}
+      {/*
+       * This column has NO flex. React Native measures it first, giving it
+       * exactly the width it needs. The center section's flex: 1 then fills
+       * only the leftover space — the badge can never be squeezed out.
+       */}
+      <View style={styles.rightSection}>
+        <Text style={[styles.time, hasUnread && styles.timeUnread]}>
+          {conversation.time}
+        </Text>
+        {hasUnread && (
+          <View style={styles.badgeWrap}>
+            <LinearGradient
+              colors={['#FF4F8B', '#8B5CF6']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.badge}
+            >
               <Text style={styles.badgeText}>{conversation.unread}</Text>
-            </View>
-          )}
-        </View>
+            </LinearGradient>
+          </View>
+        )}
       </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: 18,
-    gap: 14,
+  // ── Card ──────────────────────────────────────────────────────────────────
+ card: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingLeft: 16,
+  paddingRight: 18,
+  paddingVertical: 14,
+  borderRadius: 18,
+  marginBottom: 10,
+  backgroundColor: 'rgba(255,255,255,0.04)',
+  overflow: 'visible',
+},
+  cardSelected: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  rowSelected: {
-    backgroundColor: '#1C1C2A',
-  },
-  rowPressed: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
+  cardPressed: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
 
-  // ── Avatar
+  // ── Avatar ────────────────────────────────────────────────────────────────
   avatarWrap: {
     position: 'relative',
   },
@@ -103,7 +131,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   avatarGlow: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   avatarHead: {
     position: 'absolute',
@@ -129,63 +157,71 @@ const styles = StyleSheet.create({
     right: 1,
   },
 
-  // ── Content
-  content: {
+  // ── Center section ────────────────────────────────────────────────────────
+  centerSection: {
     flex: 1,
-    gap: 4,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    marginHorizontal: 12,
+    gap: 5,
   },
   name: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'rgba(255,255,255,0.55)',
-    flex: 1,
-    marginRight: 8,
+    color: 'rgba(255,255,255,0.5)',
   },
   nameUnread: {
     color: '#FFFFFF',
     fontWeight: '700',
   },
-  time: {
+  preview: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.28)',
+  },
+  previewUnread: {
+    color: 'rgba(255,255,255,0.58)',
+  },
+
+  // ── Right section ─────────────────────────────────────────────────────────
+rightSection: {
+  width: 44,
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 8,
+},
+  time: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.28)',
+    fontWeight: '400',
   },
   timeUnread: {
-    color: 'rgba(233,30,140,0.9)',
+    color: '#FF4F8B',
     fontWeight: '600',
   },
 
-  bottomRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  message: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.3)',
-    flex: 1,
-    marginRight: 8,
-  },
-  messageUnread: {
-    color: 'rgba(255,255,255,0.6)',
-  },
-  badge: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: '#7B2FBE',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    includeFontPadding: false,
-  },
+  // ── Gradient badge ────────────────────────────────────────────────────────
+  // badgeWrap is the clip boundary — it owns borderRadius + overflow:hidden.
+  // LinearGradient can't reliably clip its own paint to rounded corners on iOS,
+  // so the plain View wrapper does it instead and the gradient just fills in.
+badgeWrap: {
+  width: 28,
+  height: 28,
+  borderRadius: 14,
+  overflow: 'hidden',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+ badge: {
+  width: 28,
+  height: 28,
+  borderRadius: 14,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+badgeText: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#FFFFFF',
+  textAlign: 'center',
+  includeFontPadding: false,
+  lineHeight: 16,
+},
 });

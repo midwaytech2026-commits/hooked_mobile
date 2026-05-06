@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ConversationRow, SearchBar } from '../../components/inbox';
+import { ChatScreen } from '../Chat';
 import { Spacing } from '../../styles/spacing';
 import { INBOX_CONVERSATIONS } from './mockConversations';
+import type { InboxConversation } from './mockConversations';
 
 const D = {
   bg: '#0D0D14',
@@ -22,6 +24,7 @@ export function InboxScreen(): React.JSX.Element {
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>('ic4');
+  const [openChat, setOpenChat] = useState<InboxConversation | null>(null);
 
   const topPad =
     Platform.OS === 'android'
@@ -38,13 +41,26 @@ export function InboxScreen(): React.JSX.Element {
     );
   }, [query]);
 
-  const handleConversationPress = (id: string, chatId: string) => {
-    setSelectedId(id);
-    // When ChatDetailScreen is ready:
-    // navigation.navigate('ChatDetail', { chatId })
-    console.log('Open chat:', chatId);
+  const handleConversationPress = (convo: InboxConversation) => {
+    setSelectedId(convo.id);
+    setOpenChat(convo);
   };
 
+  // ── Open chat detail view ──────────────────────────────────────────────────
+  if (openChat) {
+    return (
+      <ChatScreen
+        chatId={openChat.chatId}
+        name={openChat.name}
+        online={openChat.online}
+        placeholderBg={openChat.placeholderBg}
+        placeholderAccent={openChat.placeholderAccent}
+        onBack={() => setOpenChat(null)}
+      />
+    );
+  }
+
+  // ── Inbox list ─────────────────────────────────────────────────────────────
   return (
     <View style={[styles.root, { paddingTop: topPad }]}>
       <StatusBar barStyle="light-content" backgroundColor={D.bg} />
@@ -75,7 +91,7 @@ export function InboxScreen(): React.JSX.Element {
                 key={convo.id}
                 conversation={convo}
                 selected={selectedId === convo.id}
-                onPress={() => handleConversationPress(convo.id, convo.chatId)}
+                onPress={() => handleConversationPress(convo)}
               />
             ))}
           </View>
@@ -95,7 +111,6 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xl,
   },
 
-  // ── Heading
   heading: {
     fontSize: 34,
     fontWeight: '800',
@@ -105,17 +120,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
 
-  // ── Search
   searchWrap: {
     marginBottom: Spacing.md,
   },
 
-  // ── List
   list: {
     marginTop: Spacing.sm,
   },
 
-  // ── Empty state
   emptyWrap: {
     alignItems: 'center',
     marginTop: 64,

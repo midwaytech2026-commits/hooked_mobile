@@ -13,6 +13,7 @@ export function OnboardingHeader({ step, total, onBack }: OnboardingHeaderProps)
   return (
     <View style={styles.container}>
       <Pressable
+        android_ripple={{ color: 'transparent' }}
         style={({ pressed }) => [styles.backBtn, pressed && styles.pressed]}
         onPress={onBack}
         accessibilityRole="button"

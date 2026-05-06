@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OnboardingHeader } from '../../components/onboarding/OnboardingHeader';
 import { Colors } from '../../styles/colors';
@@ -108,6 +109,7 @@ export function BioScreen({ onBack, onEnterMidWay }: BioScreenProps): React.JSX.
 
           {/* AI suggestions button */}
           <Pressable
+            android_ripple={{ color: 'transparent' }}
             style={({ pressed }) => [styles.aiBtn, pressed && styles.pressed]}
             onPress={() => {/* TODO: AI bio suggestions */}}
             accessibilityRole="button"
@@ -123,6 +125,7 @@ export function BioScreen({ onBack, onEnterMidWay }: BioScreenProps): React.JSX.
             {PROMPTS.map((prompt, i) => (
               <Pressable
                 key={i}
+                android_ripple={{ color: 'transparent' }}
                 style={({ pressed }) => [styles.promptChip, pressed && styles.pressed]}
                 onPress={() => appendPrompt(prompt)}
                 accessibilityRole="button"
@@ -135,20 +138,27 @@ export function BioScreen({ onBack, onEnterMidWay }: BioScreenProps): React.JSX.
         </ScrollView>
 
         <View style={[styles.bottomActions, { paddingBottom: Math.max(insets.bottom, Spacing.lg) }]}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.enterBtn,
-              !canEnter && styles.enterBtnDisabled,
-              pressed && canEnter && styles.pressed,
-            ]}
-            onPress={() => { if (canEnter) { onEnterMidWay(); } }}
-            disabled={!canEnter}
-            accessibilityRole="button"
-            accessibilityLabel="Enter MidWay"
-            accessibilityState={{ disabled: !canEnter }}
+          <LinearGradient
+            colors={canEnter ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.enterBtn, !canEnter && styles.enterBtnDisabled]}
           >
-            <Text style={styles.enterBtnText}>Enter MidWay 🚀</Text>
-          </Pressable>
+            <Pressable
+              android_ripple={{ color: 'transparent' }}
+              style={({ pressed }) => [
+                styles.enterBtnInner,
+                pressed && canEnter && styles.pressed,
+              ]}
+              onPress={() => { if (canEnter) { onEnterMidWay(); } }}
+              disabled={!canEnter}
+              accessibilityRole="button"
+              accessibilityLabel="Enter MidWay"
+              accessibilityState={{ disabled: !canEnter }}
+            >
+              <Text style={styles.enterBtnText}>Enter MidWay 🚀</Text>
+            </Pressable>
+          </LinearGradient>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -268,20 +278,21 @@ const styles = StyleSheet.create({
   },
   enterBtn: {
     borderRadius: 100,
-    backgroundColor: D.btnOn,
+    overflow: 'hidden',
     shadowColor: D.btnGlow,
     shadowOpacity: 0.6,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
+  },
+  enterBtnDisabled: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  enterBtnInner: {
     paddingVertical: Spacing.md + 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  enterBtnDisabled: {
-    backgroundColor: D.btnOff,
-    shadowOpacity: 0,
-    elevation: 0,
   },
   enterBtnText: {
     fontSize: 17,

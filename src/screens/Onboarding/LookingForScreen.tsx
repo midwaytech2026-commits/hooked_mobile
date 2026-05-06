@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OnboardingHeader } from '../../components/onboarding/OnboardingHeader';
 import { SelectableCard } from '../../components/onboarding/SelectableCard';
@@ -102,20 +103,27 @@ export function LookingForScreen({
       </ScrollView>
 
       <View style={[styles.bottomActions, { paddingBottom: Math.max(insets.bottom, Spacing.lg) }]}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.continueBtn,
-            !selected && styles.continueBtnDisabled,
-            pressed && !!selected && styles.pressed,
-          ]}
-          onPress={() => { if (selected) { onContinue(); } }}
-          disabled={!selected}
-          accessibilityRole="button"
-          accessibilityLabel="Continue"
-          accessibilityState={{ disabled: !selected }}
+        <LinearGradient
+          colors={selected ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.continueBtn, !selected && styles.continueBtnDisabled]}
         >
-          <Text style={styles.continueBtnText}>Continue</Text>
-        </Pressable>
+          <Pressable
+            android_ripple={{ color: 'transparent' }}
+            style={({ pressed }) => [
+              styles.continueBtnInner,
+              pressed && !!selected && styles.pressed,
+            ]}
+            onPress={() => { if (selected) { onContinue(); } }}
+            disabled={!selected}
+            accessibilityRole="button"
+            accessibilityLabel="Continue"
+            accessibilityState={{ disabled: !selected }}
+          >
+            <Text style={styles.continueBtnText}>Continue</Text>
+          </Pressable>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -159,20 +167,21 @@ const styles = StyleSheet.create({
   },
   continueBtn: {
     borderRadius: 100,
-    backgroundColor: D.btnOn,
+    overflow: 'hidden',
     shadowColor: D.btnGlow,
     shadowOpacity: 0.6,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
+  },
+  continueBtnDisabled: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  continueBtnInner: {
     paddingVertical: Spacing.md + 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  continueBtnDisabled: {
-    backgroundColor: D.btnOff,
-    shadowOpacity: 0,
-    elevation: 0,
   },
   continueBtnText: {
     fontSize: 17,

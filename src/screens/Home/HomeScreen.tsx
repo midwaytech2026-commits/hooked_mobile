@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
 import {
-  Dimensions,
   Platform,
   Pressable,
   StatusBar,
@@ -13,9 +12,11 @@ import {
   ActionButton,
   BottomTabBar,
   CARD_HEIGHT,
+  CARD_WIDTH,
   ProfileCard,
 } from '../../components/home';
 import type { ProfileCardRef, TabName } from '../../components/home';
+import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from '../../styles/colors';
 import { Spacing } from '../../styles/spacing';
 import { MOCK_PROFILES } from './mockProfiles';
@@ -32,10 +33,13 @@ const D = {
   dimText: 'rgba(255,255,255,0.45)',
 } as const;
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export function HomeScreen(): React.JSX.Element {
+interface HomeScreenProps {
+  onSignOut?: () => void;
+}
+
+export function HomeScreen({ onSignOut }: HomeScreenProps): React.JSX.Element {
   const insets = useSafeAreaInsets();
   const cardRef = useRef<ProfileCardRef>(null);
 
@@ -93,6 +97,7 @@ export function HomeScreen(): React.JSX.Element {
           {/* Header */}
           <View style={[styles.header, { paddingTop: topPad + 8 }]}>
             <Pressable
+              android_ripple={{ color: 'transparent' }}
               style={({ pressed }) => [styles.headerBtn, pressed && styles.pressed]}
               onPress={() => console.log('Filters')}
               accessibilityRole="button"
@@ -102,24 +107,17 @@ export function HomeScreen(): React.JSX.Element {
             </Pressable>
 
             <View style={styles.logo}>
-              {/*
-                ── LinearGradient upgrade (logo circle) ────────────────────────
-                import LinearGradient from 'react-native-linear-gradient';
-                <LinearGradient
-                  colors={Colors.brand.gradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.logoCircle}
-                />
-                ─────────────────────────────────────────────────────────────── */}
-              <View style={styles.logoCircle}>
-                <View style={[styles.logoHalf, { backgroundColor: Colors.brand.pink }]} />
-                <View style={[styles.logoHalf, { backgroundColor: Colors.brand.purple }]} />
-              </View>
+              <LinearGradient
+                colors={Colors.brand.gradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.logoCircle}
+              />
               <Text style={styles.logoText}>MidWay</Text>
             </View>
 
             <Pressable
+              android_ripple={{ color: 'transparent' }}
               style={({ pressed }) => [styles.boostBtn, pressed && styles.pressed]}
               onPress={handleBoostAction}
               accessibilityRole="button"
@@ -130,8 +128,8 @@ export function HomeScreen(): React.JSX.Element {
             </Pressable>
           </View>
 
-          {/* Card area */}
-          <View style={styles.cardArea}>
+          {/* Card + action buttons grouped so buttons can overlap card bottom */}
+          <View style={styles.cardSection}>
             {noMoreProfiles ? (
               <AllCaughtUp
                 onRefresh={() => { setProfileIndex(0); setHistory([]); }}
@@ -145,46 +143,45 @@ export function HomeScreen(): React.JSX.Element {
                 onSwipedRight={handleSwipeRight}
               />
             )}
-          </View>
 
-          {/* Action buttons */}
-          <View style={styles.actionsRow}>
-            <ActionButton
-              icon="↩"
-              size="sm"
-              iconColor="#F5C542"
-              borderColor="#F5C54240"
-              onPress={handleRewind}
-            />
-            <ActionButton
-              icon="✕"
-              size="md"
-              iconColor="#FFFFFF"
-              borderColor="#FFFFFF20"
-              onPress={() => cardRef.current?.swipeLeft()}
-            />
-            <ActionButton
-              icon="♥"
-              size="lg"
-              iconColor="#FFFFFF"
-              backgroundColor="#BF22A1"
-              glowColor={Colors.brand.pink}
-              onPress={() => cardRef.current?.swipeRight()}
-            />
-            <ActionButton
-              icon="★"
-              size="md"
-              iconColor="#9B6FD4"
-              borderColor="#9B6FD440"
-              onPress={handleSuperLike}
-            />
-            <ActionButton
-              icon="⚡"
-              size="sm"
-              iconColor="#F5A623"
-              borderColor="#F5A62340"
-              onPress={handleBoostAction}
-            />
+            <View style={styles.actionsRow}>
+              <ActionButton
+                icon="↩"
+                size="sm"
+                iconColor="#F5C542"
+                borderColor="#F5C54240"
+                onPress={handleRewind}
+              />
+              <ActionButton
+                icon="✕"
+                size="md"
+                iconColor="#FFFFFF"
+                borderColor="#FFFFFF20"
+                onPress={() => cardRef.current?.swipeLeft()}
+              />
+              <ActionButton
+                icon="♥"
+                size="lg"
+                iconColor="#FFFFFF"
+                gradientColors={['#FF4F8B', '#8B5CF6']}
+                glowColor={Colors.brand.pink}
+                onPress={() => cardRef.current?.swipeRight()}
+              />
+              <ActionButton
+                icon="★"
+                size="md"
+                iconColor="#9B6FD4"
+                borderColor="#9B6FD440"
+                onPress={handleSuperLike}
+              />
+              <ActionButton
+                icon="⚡"
+                size="sm"
+                iconColor="#F5A623"
+                borderColor="#F5A62340"
+                onPress={handleBoostAction}
+              />
+            </View>
           </View>
         </View>
       )}
@@ -213,13 +210,12 @@ export function HomeScreen(): React.JSX.Element {
       {/* ── Profile tab ───────────────────────────────────────────────────── */}
       {activeTab === 'profile' && (
         <View style={styles.tabContent}>
-          <ProfileScreen />
+          <ProfileScreen onSignOut={onSignOut} />
         </View>
       )}
 
       {/* ── Always-visible bottom bar ──────────────────────────────────────── */}
       <BottomTabBar activeTab={activeTab} onTabPress={setActiveTab} />
-      <View style={{ height: insets.bottom, backgroundColor: '#111119' }} />
     </View>
   );
 }
@@ -288,11 +284,6 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     overflow: 'hidden',
-    flexDirection: 'row',
-  },
-  logoHalf: {
-    flex: 1,
-    height: '100%',
   },
   logoText: {
     fontSize: 20,
@@ -319,21 +310,23 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
 
-  // ── Discover: Card area
-  cardArea: {
+  // ── Discover: Card + buttons section
+  cardSection: {
     flex: 1,
     paddingHorizontal: Spacing.md,
     justifyContent: 'center',
   },
 
-  // ── Discover: Action buttons
+  // ── Discover: Action buttons (overlaps card bottom via negative marginTop)
   actionsRow: {
+    width: CARD_WIDTH,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: Math.max(10, (SCREEN_WIDTH - Spacing.lg * 2 - (50 + 58 + 72 + 58 + 50)) / 4),
-    paddingHorizontal: Spacing.lg,
+    justifyContent: 'space-evenly',
     paddingVertical: Spacing.md,
+    marginTop: -28,
+    zIndex: 10,
+    elevation: 20,
   },
 
   pressed: { opacity: 0.72 },

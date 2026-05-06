@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from '../../styles/colors';
 import { ProfileChip } from './ProfileChip';
 import type { Profile } from '../../screens/Home/mockProfiles';
@@ -17,6 +18,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const SWIPE_THRESHOLD = SCREEN_WIDTH * 0.28;
 const SWIPE_OUT_DURATION = 240;
 
+export const CARD_WIDTH = SCREEN_WIDTH - 32;
 export const CARD_HEIGHT = Math.round(SCREEN_HEIGHT * 0.63);
 
 // ── Imperative API ────────────────────────────────────────────────────────────
@@ -215,8 +217,11 @@ function CardOverlays({
       </View>
 
       {/* ── Bottom overlay ──────────────────────────────────── */}
-      {/* Scrim to make text legible over the card */}
-      <View style={styles.scrim} pointerEvents="none" />
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.22)', 'rgba(0,0,0,0.92)']}
+        style={styles.scrim}
+        pointerEvents="none"
+      />
 
       <View style={styles.bottomInfo}>
         {/* Name · Age · Verified */}
@@ -333,10 +338,14 @@ const styles = StyleSheet.create({
 
   // ── Top badges ──────────────────────────────────────────
   topBadges: {
+    position: 'absolute',
+    top: 14,
+    left: 14,
+    right: 14,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 14,
+    zIndex: 5,
   },
   matchBadge: {
     backgroundColor: Colors.brand.pink,
@@ -377,8 +386,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 220,
-    backgroundColor: 'rgba(0,0,0,0.62)',
+    height: Math.round(CARD_HEIGHT * 0.6),
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },

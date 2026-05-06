@@ -24,6 +24,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '../../styles/colors';
 import { Spacing } from '../../styles/spacing';
+import LinearGradient from 'react-native-linear-gradient';
 
 // ── Uncomment when image is ready ────────────────────────────────────────────
 // const BG_IMAGE = require('../../assets/images/intro-bg.jpg');  ← ADD IMAGE (step 2 of 3)
@@ -78,7 +79,7 @@ export function IntroductionScreen({
 
           <ImageBackground                     ← ADD IMAGE (step 3 of 3)
             source={BG_IMAGE}
-            style={StyleSheet.absoluteFillObject}
+            style={StyleSheet.absoluteFill}
             resizeMode="cover"
           />
           <View style={styles.overlay} />
@@ -128,49 +129,24 @@ export function IntroductionScreen({
 
           {/* ── Buttons ─────────────────────────────────────────────────── */}
           <View style={styles.buttons}>
-
-            {/*
-              ── Gradient upgrade path ─────────────────────────────────────
-              After:  npm install react-native-linear-gradient
-                      cd ios && pod install
-
-              REMOVE the <Pressable> block below and UNCOMMENT this instead:
-
-              import LinearGradient from 'react-native-linear-gradient';
-
-              <LinearGradient
-                colors={Colors.brand.gradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.primaryBtn}
-              >
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.primaryBtnInner,
-                    pressed && styles.pressed,
-                  ]}
-                  onPress={onCreateAccount}
-                  accessibilityRole="button"
-                  accessibilityLabel="Create account"
-                >
-                  <Text style={styles.primaryBtnText}>Create account</Text>
-                </Pressable>
-              </LinearGradient>
-              ──────────────────────────────────────────────────────────── */}
-
-            {/* Solid-color fallback (remove once LinearGradient is installed) */}
-            <Pressable
-              style={({ pressed }) => [
-                styles.primaryBtn,
-                styles.primaryBtnInner,
-                pressed && styles.pressed,
-              ]}
-              onPress={onCreateAccount}
-              accessibilityRole="button"
-              accessibilityLabel="Create account"
+            <LinearGradient
+              colors={Colors.brand.gradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.primaryBtn}
             >
-              <Text style={styles.primaryBtnText}>Create account</Text>
-            </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.primaryBtnInner,
+                  pressed && styles.pressed,
+                ]}
+                onPress={onCreateAccount}
+                accessibilityRole="button"
+                accessibilityLabel="Create account"
+              >
+                <Text style={styles.primaryBtnText}>Create account</Text>
+              </Pressable>
+            </LinearGradient>
 
             {/* Secondary button */}
             <Pressable
@@ -210,7 +186,8 @@ const styles = StyleSheet.create({
     backgroundColor: B.bgDeep,
   },
   bgBase: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: B.bgDeep,
   },
   // Soft purple atmosphere top-left (simulates warm light source)
@@ -246,7 +223,8 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: B.overlay,
   },
 

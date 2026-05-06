@@ -1,0 +1,4 @@
+/Users/anuragmishra/Documents/minway/mobile/Demo/android/app/.cxx/RelWithDebInfo/33y1p5r3/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/foo.dir
+/Users/anuragmishra/Documents/minway/mobile/Demo/android/app/.cxx/RelWithDebInfo/33y1p5r3/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/boo.dir
+/Users/anuragmishra/Documents/minway/mobile/Demo/android/app/.cxx/RelWithDebInfo/33y1p5r3/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/edit_cache.dir
+/Users/anuragmishra/Documents/minway/mobile/Demo/android/app/.cxx/RelWithDebInfo/33y1p5r3/armeabi-v7a/CMakeFiles/_CMakeLTOTest-CXX/bin/CMakeFiles/rebuild_cache.dir

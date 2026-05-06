@@ -1,11 +1,3 @@
-/**
- * VerifyOtpScreen — 6-digit OTP / email verification.
- *
- * Gradient on filled boxes / Verify button:
- *   npm install react-native-linear-gradient && cd ios && pod install
- *   then follow the upgrade comments inside the component.
- */
-
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
@@ -19,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from '../../styles/colors';
 import { Spacing } from '../../styles/spacing';
 
@@ -204,55 +197,59 @@ export function VerifyOtpScreen({
               const isFilled = digit !== '';
               const isActive = focusedIdx === i;
 
+              if (isFilled) {
+                return (
+                  <LinearGradient
+                    key={i}
+                    colors={Colors.brand.gradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={[styles.otpBox, styles.otpBoxFilled]}
+                  >
+                    <TextInput
+                      ref={el => { inputRefs.current[i] = el; }}
+                      style={styles.otpInput}
+                      value={digit}
+                      onChangeText={text => handleChange(text, i)}
+                      onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, i)}
+                      onFocus={() => setFocusedIdx(i)}
+                      onBlur={() => setFocusedIdx(-1)}
+                      keyboardType="numeric"
+                      maxLength={2}
+                      textAlign="center"
+                      textAlignVertical="center"
+                      selectTextOnFocus
+                      caretHidden={Platform.OS === 'ios'}
+                      selectionColor="transparent"
+                      returnKeyType="done"
+                      textContentType="oneTimeCode"
+                      importantForAutofill="yes"
+                      accessibilityLabel={`Digit ${i + 1} of ${OTP_LENGTH}`}
+                    />
+                  </LinearGradient>
+                );
+              }
+
               return (
-                /*
-                  ── Gradient upgrade (per-box) ───────────────────────────────
-                  To apply a gradient to filled boxes, wrap the TextInput with:
-
-                  import LinearGradient from 'react-native-linear-gradient';
-
-                  {isFilled ? (
-                    <LinearGradient
-                      key={i}
-                      colors={Colors.brand.gradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                      style={[styles.otpBox, styles.otpBoxFilled]}
-                    >
-                      <TextInput
-                        style={[styles.otpInput, { backgroundColor: 'transparent' }]}
-                        ...same props as below...
-                      />
-                    </LinearGradient>
-                  ) : (
-                    <TextInput key={i} ... />
-                  )}
-                  ─────────────────────────────────────────────────────────── */
                 <TextInput
                   key={i}
-                  ref={el => {
-                    inputRefs.current[i] = el;
-                  }}
-                  style={[
-                    styles.otpBox,
-                    isFilled && styles.otpBoxFilled,
-                    isActive && !isFilled && styles.otpBoxActive,
-                  ]}
+                  ref={el => { inputRefs.current[i] = el; }}
+                  style={[styles.otpBox, isActive && styles.otpBoxActive]}
                   value={digit}
                   onChangeText={text => handleChange(text, i)}
                   onKeyPress={({ nativeEvent }) => handleKeyPress(nativeEvent.key, i)}
                   onFocus={() => setFocusedIdx(i)}
                   onBlur={() => setFocusedIdx(-1)}
                   keyboardType="numeric"
-                  maxLength={2}        // 2 lets us detect replacement of existing digit
+                  maxLength={2}
                   textAlign="center"
                   textAlignVertical="center"
-                  selectTextOnFocus    // selects existing digit so next keypress replaces it
+                  selectTextOnFocus
                   caretHidden={Platform.OS === 'ios'}
                   selectionColor="transparent"
                   returnKeyType="done"
-                  textContentType="oneTimeCode"   // iOS OTP autofill
-                  importantForAutofill="yes"       // Android autofill hint
+                  textContentType="oneTimeCode"
+                  importantForAutofill="yes"
                   accessibilityLabel={`Digit ${i + 1} of ${OTP_LENGTH}`}
                 />
               );
@@ -285,50 +282,26 @@ export function VerifyOtpScreen({
             { paddingBottom: Math.max(insets.bottom, Spacing.lg) },
           ]}
         >
-          {/*
-            ── LinearGradient upgrade (button) ────────────────────────────────
-            After: npm install react-native-linear-gradient && cd ios && pod install
-
-            REMOVE solid-colour <Pressable> below and UNCOMMENT:
-
-            import LinearGradient from 'react-native-linear-gradient';
-
-            <LinearGradient
-              colors={isComplete ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.verifyBtn}
-            >
-              <Pressable
-                style={({ pressed }) => [
-                  styles.verifyBtnInner,
-                  pressed && isComplete && styles.pressed,
-                ]}
-                onPress={onVerify}
-                disabled={!isComplete}
-                accessibilityRole="button"
-                accessibilityLabel="Verify code"
-              >
-                <Text style={styles.verifyBtnText}>Verify</Text>
-              </Pressable>
-            </LinearGradient>
-            ─────────────────────────────────────────────────────────────── */}
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.verifyBtn,
-              styles.verifyBtnInner,
-              !isComplete && styles.verifyBtnDisabled,
-              pressed && isComplete && styles.pressed,
-            ]}
-            onPress={onVerify}
-            disabled={!isComplete}
-            accessibilityRole="button"
-            accessibilityLabel="Verify code"
-            accessibilityState={{ disabled: !isComplete }}
+          <LinearGradient
+            colors={isComplete ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.verifyBtn}
           >
-            <Text style={styles.verifyBtnText}>Verify</Text>
-          </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.verifyBtnInner,
+                pressed && isComplete && styles.pressed,
+              ]}
+              onPress={onVerify}
+              disabled={!isComplete}
+              accessibilityRole="button"
+              accessibilityLabel="Verify code"
+              accessibilityState={{ disabled: !isComplete }}
+            >
+              <Text style={styles.verifyBtnText}>Verify</Text>
+            </Pressable>
+          </LinearGradient>
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -408,16 +381,27 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
 
-  // Filled box — digit entered
-  // ── LinearGradient upgrade: replace backgroundColor with the gradient wrapper described above
+  // Filled box — LinearGradient container
   otpBoxFilled: {
-    backgroundColor: D.boxFilled,
-    // Pink glow to suggest gradient warmth
+    overflow: 'hidden',
     shadowColor: Colors.brand.pink,
     shadowOpacity: 0.45,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
     elevation: 6,
+  },
+
+  // TextInput inside the filled LinearGradient
+  otpInput: {
+    width: BOX_SIZE,
+    height: BOX_SIZE,
+    backgroundColor: 'transparent',
+    fontSize: Math.floor(BOX_SIZE * 0.42),
+    fontWeight: '700',
+    color: Colors.text.inverse,
+    includeFontPadding: false,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 
   // Active box — focused but empty
@@ -453,11 +437,9 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
   },
 
-  // Shared outer shape — works for both solid Pressable and LinearGradient wrapper
   verifyBtn: {
     borderRadius: 100,
     overflow: 'hidden',
-    backgroundColor: D.btnOn,
     shadowColor: D.btnGlow,
     shadowOpacity: 0.6,
     shadowRadius: 20,
@@ -468,11 +450,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md + 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  verifyBtnDisabled: {
-    backgroundColor: D.btnOff,
-    shadowOpacity: 0,
-    elevation: 0,
   },
   verifyBtnText: {
     fontSize: 17,

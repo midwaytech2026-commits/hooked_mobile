@@ -1,0 +1,1 @@
+/Users/anuragmishra/Documents/minway/mobile/Demo/android/app/build/intermediates/cxx/RelWithDebInfo/33y1p5r3/obj/arm64-v8a

@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { Colors } from '../../styles/colors';
 import { Spacing } from '../../styles/spacing';
 
@@ -24,11 +25,12 @@ export function ProfileCompletionCard({
 
       {/* Progress bar */}
       <View style={styles.track}>
-        <View style={[styles.fill, { width: `${clamped}%` as `${number}%` }]}>
-          {/* Two-color gradient fallback */}
-          <View style={[styles.fillHalf, { backgroundColor: Colors.brand.pink }]} />
-          <View style={[styles.fillHalf, { backgroundColor: Colors.brand.purple }]} />
-        </View>
+        <LinearGradient
+          colors={Colors.brand.gradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.fill, { width: `${clamped}%` as `${number}%` }]}
+        />
       </View>
 
       {/* Hint text */}
@@ -72,13 +74,7 @@ const styles = StyleSheet.create({
   },
   fill: {
     height: '100%',
-    flexDirection: 'row',
     borderRadius: 3,
-    overflow: 'hidden',
-  },
-  fillHalf: {
-    flex: 1,
-    height: '100%',
   },
 
   hint: {

@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OnboardingHeader } from '../../components/onboarding/OnboardingHeader';
 import { Colors } from '../../styles/colors';
@@ -116,6 +117,7 @@ export function InterestsScreen({
             return (
               <Pressable
                 key={interest.id}
+                android_ripple={{ color: 'transparent' }}
                 style={({ pressed }) => [
                   styles.chip,
                   isSelected && styles.chipSelected,
@@ -137,20 +139,27 @@ export function InterestsScreen({
       </ScrollView>
 
       <View style={[styles.bottomActions, { paddingBottom: Math.max(insets.bottom, Spacing.lg) }]}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.continueBtn,
-            !canContinue && styles.continueBtnDisabled,
-            pressed && canContinue && styles.pressed,
-          ]}
-          onPress={() => { if (canContinue) { onContinue(); } }}
-          disabled={!canContinue}
-          accessibilityRole="button"
-          accessibilityLabel="Continue"
-          accessibilityState={{ disabled: !canContinue }}
+        <LinearGradient
+          colors={canContinue ? Colors.brand.gradient : ['#3A1033', '#3A1033']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
         >
-          <Text style={styles.continueBtnText}>Continue</Text>
-        </Pressable>
+          <Pressable
+            android_ripple={{ color: 'transparent' }}
+            style={({ pressed }) => [
+              styles.continueBtnInner,
+              pressed && canContinue && styles.pressed,
+            ]}
+            onPress={() => { if (canContinue) { onContinue(); } }}
+            disabled={!canContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continue"
+            accessibilityState={{ disabled: !canContinue }}
+          >
+            <Text style={styles.continueBtnText}>Continue</Text>
+          </Pressable>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -227,20 +236,21 @@ const styles = StyleSheet.create({
   },
   continueBtn: {
     borderRadius: 100,
-    backgroundColor: D.btnOn,
+    overflow: 'hidden',
     shadowColor: D.btnGlow,
     shadowOpacity: 0.6,
     shadowRadius: 20,
     shadowOffset: { width: 0, height: 6 },
     elevation: 12,
+  },
+  continueBtnDisabled: {
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  continueBtnInner: {
     paddingVertical: Spacing.md + 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  continueBtnDisabled: {
-    backgroundColor: D.btnOff,
-    shadowOpacity: 0,
-    elevation: 0,
   },
   continueBtnText: {
     fontSize: 17,
